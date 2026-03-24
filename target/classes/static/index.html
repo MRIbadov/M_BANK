@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sky Online Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── AUTH ───────────────────────────────────────────────── -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-logo"><span>Sky</span>bank</div>
+      <div class="auth-tagline">Secure &amp; Simple Online Banking</div>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <div class="auth-body">
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form active" onsubmit="doLogin(event)">
+        <div id="login-error" class="alert alert-error"></div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="john.doe" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" onsubmit="doRegister(event)">
+        <div id="reg-error" class="alert alert-error"></div>
+        <div id="reg-success" class="alert alert-success"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="reg-first" placeholder="Anna" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="reg-last" placeholder="Nowak" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="anna@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="anna.nowak" required>
+        </div>
+        <div class="form-group">
+          <label>Password (min 8 characters)</label>
+          <input type="password" id="reg-password" placeholder="••••••••" required minlength="8">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="reg-phone" placeholder="+48 123 456 789">
+        </div>
+        <button type="submit" class="btn btn-primary" id="reg-btn">Create Account</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ────────────────────────────────────────────────── -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-logo">Sky</div>
+    <div class="topbar-user">
+      <div class="user-meta">
+        <div class="name" id="top-name">—</div>
+        <div class="role">Personal Banking</div>
+      </div>
+      <div class="avatar" id="top-avatar">?</div>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-section">
+        <div class="nav-label">Menu</div>
+        <div class="nav-item active" onclick="navigate('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div>
+        <div class="nav-item" onclick="navigate('accounts')"><span class="nav-icon">💳</span> Accounts</div>
+        <div class="nav-item" onclick="navigate('transfer')"><span class="nav-icon">↔️</span> Transfer</div>
+        <div class="nav-item" onclick="navigate('transactions')"><span class="nav-icon">📋</span> Transactions</div>
+      </div>
+      <div class="nav-section" style="margin-top:16px">
+        <div class="nav-label">Account</div>
+        <div class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span> Profile</div>
+        <div class="nav-item" onclick="navigate('newaccount')"><span class="nav-icon">➕</span> New Account</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="dash-greeting">Welcome back!</div>
+
+        <div class="grid-3" id="dash-stats">
+          <div class="stat-card">
+            <div class="stat-label">Total Balance</div>
+            <div class="stat-value" id="dash-total">—</div>
+            <div class="stat-sub">PLN across all accounts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Accounts</div>
+            <div class="stat-value" id="dash-accs">—</div>
+            <div class="stat-badge info">All in good standing</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value" id="dash-txcount">—</div>
+            <div class="stat-sub">Total recorded</div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-title">Recent Transactions</span>
+            <button class="btn btn-outline btn-sm" onclick="navigate('transactions')">View All →</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Description</th><th>From / To</th><th>Type</th><th>Amount</th></tr>
+            </thead>
+            <tbody id="dash-tx-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACCOUNTS -->
+      <div class="page" id="page-accounts">
+        <div class="page-title">My Accounts</div>
+        <div class="page-sub">Click an account to view its transactions</div>
+        <div id="accounts-grid" class="account-cards"></div>
+        <div class="table-card" id="acc-detail-card" style="display:none">
+          <div class="table-header">
+            <span class="table-title" id="acc-detail-title">Account Transactions</span>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('acc-detail-card').style.display='none'">Close</button>
+          </div>
+          <table>
+            <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Counterparty</th><th>Amount</th></tr></thead>
+            <tbody id="acc-tx-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRANSFER -->
+      <div class="page" id="page-transfer">
+        <div class="page-title">Transfer Funds</div>
+        <div class="page-sub">Move money between your accounts</div>
+
+        <div class="security-banner">
+          <div class="security-icon">🔒</div>
+          <div class="security-text">
+            <strong>Encrypted Transfer</strong>
+            All transaction details are AES-256 encrypted in the database. Your data is protected.
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div id="transfer-alert-error" class="alert alert-error"></div>
+          <div id="transfer-alert-success" class="alert alert-success"></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>From Account</label>
+              <select id="tf-from"></select>
+            </div>
+            <div class="form-group">
+              <label>To Account</label>
+              <select id="tf-to"></select>
+            </div>
+            <div class="form-group form-full">
+              <label>Amount (PLN)</label>
+              <input type="number" id="tf-amount" placeholder="0.00" min="0.01" step="0.01">
+            </div>
+            <div class="form-group form-full">
+              <label>Description</label>
+              <input type="text" id="tf-desc" placeholder="e.g. Monthly savings">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="doTransfer()">🔒 Execute Transfer</button>
+            <button class="btn btn-outline" onclick="clearTransfer()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div class="page" id="page-transactions">
+        <div class="page-title">All Transactions</div>
+        <div class="page-sub">Your complete transaction history</div>
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-title">History</span>
+            <select id="tx-acc-filter" onchange="renderAllTx()" style="padding:7px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; cursor:pointer; outline:none;">
+              <option value="">All Accounts</option>
+            </select>
+          </div>
+          <table>
+            <thead><tr><th>Date</th><th>Description</th><th>From</th><th>To</th><th>Type</th><th>Amount</th></tr></thead>
+            <tbody id="all-tx-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="page-title">My Profile</div>
+        <div class="page-sub">Your personal information</div>
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profile-avatar">?</div>
+          <div>
+            <div class="profile-name" id="profile-name">—</div>
+            <div class="profile-username" id="profile-uname">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="security-banner" style="margin-bottom:20px">
+            <div class="security-icon">🛡️</div>
+            <div class="security-text">
+              <strong>Your data is protected</strong>
+              Email, phone number, and all transaction descriptions are AES-256 encrypted at rest. Passwords are BCrypt hashed with strength 12.
+            </div>
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><div class="info-label">First Name</div><div class="info-value" id="pf-first">—</div></div>
+            <div class="info-item"><div class="info-label">Last Name</div><div class="info-value" id="pf-last">—</div></div>
+            <div class="info-item"><div class="info-label">Email</div><div class="info-value" id="pf-email">—</div></div>
+            <div class="info-item"><div class="info-label">Username</div><div class="info-value" id="pf-username">—</div></div>
+            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="pf-phone">—</div></div>
+            <div class="info-item"><div class="info-label">Password</div><div class="info-value" style="color:var(--text-sm)">BCrypt hashed (secure)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW ACCOUNT -->
+      <div class="page" id="page-newaccount">
+        <div class="page-title">Open New Account</div>
+        <div class="page-sub">Expand your banking portfolio</div>
+        <div class="form-card">
+          <div id="new-acc-error" class="alert alert-error"></div>
+          <div id="new-acc-success" class="alert alert-success"></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Account Type</label>
+              <select id="new-type">
+                <option value="CHECKING">Checking</option>
+                <option value="SAVINGS">Savings</option>
+                <option value="INVESTMENT">Investment</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Account Name</label>
+              <input type="text" id="new-name" placeholder="e.g. Emergency Fund">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="createAccount()">Open Account</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
