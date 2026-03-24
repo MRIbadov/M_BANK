@@ -2,11 +2,59 @@ import { $, showAlert, showToast } from './utils.js';
 import { api, state } from './api.js';
 import * as ui from './ui.js';
 
+function hydrateProfile() {
+    const user = state.currentUser;
+    if (!user) return;
+
+    const fullName = `${user.firstName} ${user.lastName}`;
+    $('top-name').textContent = fullName;
+    $('dash-greeting').textContent = `Welcome back, ${user.firstName}!`;
+    $('top-avatar').textContent = user.firstName?.[0]?.toUpperCase() || '?';
+
+    $('profile-name').textContent = fullName;
+    $('profile-uname').textContent = `@${user.username}`;
+    $('profile-avatar').textContent = user.firstName?.[0]?.toUpperCase() || '?';
+    $('pf-first').textContent = user.firstName;
+    $('pf-last').textContent = user.lastName;
+    $('pf-email').textContent = user.email;
+    $('pf-username').textContent = user.username;
+    $('pf-phone').textContent = user.phoneNumber || '—';
+}
+
+function hydrateAccountSelectors() {
+    const accountOptions = state.accounts.map(a =>
+        `<option value="${a.id}">${a.accountName} (${a.accountNumber.slice(0, 14)}...) — ${a.currency} ${a.balance}</option>`
+    ).join('');
+
+    $('tf-from').innerHTML = accountOptions;
+    $('tf-to').innerHTML = accountOptions;
+
+    const filterOptions = state.accounts.map(a =>
+        `<option value="${a.id}">${a.accountName}</option>`
+    ).join('');
+    $('tx-acc-filter').innerHTML = `<option value="">All Accounts</option>${filterOptions}`;
+}
+
+async function refreshAuthenticatedState() {
+    state.currentUser = await api('/api/bank/profile');
+    [state.accounts, state.transactions] = await Promise.all([
+        api('/api/bank/accounts'),
+        api('/api/bank/transactions')
+    ]);
+
+    hydrateProfile();
+    hydrateAccountSelectors();
+    ui.renderDashboard();
+    ui.renderAccounts();
+    ui.renderAllTx();
+}
+
 // --- AUTH LOGIC ---
 window.switchAuthTab = (tab) => {
-    document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
-    $('login-form').classList.toggle('active', tab==='login');
-    $('register-form').classList.toggle('active', tab==='register');
+    document.querySelectorAll('.auth-tab').forEach((t, i) =>
+        t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register')));
+    $('login-form').classList.toggle('active', tab === 'login');
+    $('register-form').classList.toggle('active', tab === 'register');
 };
 
 window.doLogin = async (e) => {
@@ -20,9 +68,33 @@ window.doLogin = async (e) => {
         });
         state.token = data.token;
         localStorage.setItem('nb_token', data.token);
-        location.reload(); // Refresh to boot the app state
-    } catch(err) {
+        location.reload();
+    } catch (err) {
         showAlert('login-error', err.message);
+        btn.disabled = false;
+    }
+};
+
+window.doRegister = async (e) => {
+    e.preventDefault();
+    const btn = $('reg-btn');
+    btn.disabled = true;
+    try {
+        await api('/api/auth/register', 'POST', {
+            firstName: $('reg-first').value,
+            lastName: $('reg-last').value,
+            email: $('reg-email').value,
+            username: $('reg-username').value,
+            password: $('reg-password').value,
+            phoneNumber: $('reg-phone').value
+        });
+
+        showAlert('reg-success', 'Account created successfully. You can sign in now.');
+        $('register-form').reset();
+        window.switchAuthTab('login');
+    } catch (err) {
+        showAlert('reg-error', err.message);
+    } finally {
         btn.disabled = false;
     }
 };
@@ -30,6 +102,28 @@ window.doLogin = async (e) => {
 window.logout = () => {
     localStorage.removeItem('nb_token');
     location.reload();
+};
+
+window.doTransfer = async () => {
+    try {
+        await api('/api/bank/transfer', 'POST', {
+            fromAccountId: Number($('tf-from').value),
+            toAccountId: Number($('tf-to').value),
+            amount: Number($('tf-amount').value),
+            description: $('tf-desc').value
+        });
+
+        showAlert('transfer-alert-success', 'Transfer completed successfully.');
+        window.clearTransfer();
+        await refreshAuthenticatedState();
+    } catch (err) {
+        showAlert('transfer-alert-error', err.message);
+    }
+};
+
+window.clearTransfer = () => {
+    $('tf-amount').value = '';
+    $('tf-desc').value = '';
 };
 
 // --- NAVIGATION ---
@@ -42,21 +136,14 @@ window.navigate = (page) => {
 
 // --- INIT ---
 (async () => {
-    if (state.token) {
-        try {
-            state.currentUser = await api('/api/bank/profile');
-            $('auth-screen').style.display = 'none';
-            $('app').style.display = 'block';
+    if (!state.token) return;
 
-            [state.accounts, state.transactions] = await Promise.all([
-                api('/api/bank/accounts'),
-                api('/api/bank/transactions')
-            ]);
-
-            ui.renderDashboard();
-            ui.renderAccounts();
-        } catch (e) {
-            localStorage.removeItem('nb_token');
-        }
+    try {
+        await refreshAuthenticatedState();
+        $('auth-screen').style.display = 'none';
+        $('app').style.display = 'block';
+    } catch (e) {
+        localStorage.removeItem('nb_token');
+        showToast('Session expired. Please sign in again.');
     }
 })();
