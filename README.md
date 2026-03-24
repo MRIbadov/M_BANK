@@ -1,10 +1,14 @@
-# 🏦 NovaBanque — Spring Boot Bank Management System
+# — Spring Boot Bank Management System
 
 A secure, full-stack banking web application built with Java 21, Spring Boot 3, Spring Security, and an H2/PostgreSQL database.
 
+
+![tt](https://github.com/user-attachments/assets/81cbfe4f-6476-46b5-9663-74b0012d1587)
+![ff](https://github.com/user-attachments/assets/f7cf41e5-5197-4235-901a-e421b0230052)
+
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Requirements
 - Java 21+
@@ -25,11 +29,11 @@ Then open: **http://localhost:8080**
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-src/main/java/com/aurumbank/
-├── AurumBankApplication.java     ← Entry point + seed data
+src/main/java/com/MMCBank/
+├── MMCBankApplication.java     ← Entry point + seed data
 ├── config/
 │   └── SecurityConfig.java       ← Spring Security + JWT + BCrypt + CORS
 ├── controller/
@@ -61,7 +65,7 @@ src/main/java/com/aurumbank/
 
 ---
 
-## 🔐 Security Features
+## Security Features
 
 | Feature | Implementation |
 |---------|---------------|
@@ -104,13 +108,13 @@ src/main/java/com/aurumbank/
 
 ---
 
-## 🗄️ Database
+## Database
 
-**Development (default):** H2 in-memory
+**Default:** H2 in-memory
 - H2 Console: http://localhost:8080/h2-console
 - JDBC URL: `jdbc:h2:mem:aurumbank`
 
-**Production:** PostgreSQL — uncomment the PostgreSQL config in `application.properties`:
+**Complex:** PostgreSQL — uncomment the PostgreSQL config in `application.properties`:
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/aurumbank
 spring.datasource.username=postgres
@@ -121,7 +125,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 ---
 
-## 🛠️ Configuration
+## Configuration
 
 Edit `src/main/resources/application.properties`:
 
@@ -135,9 +139,9 @@ app.encryption.key=YourEncryptionKey
 
 ---
 
-## 🖥️ Frontend
+## Frontend
 
-Single-page app at `src/main/resources/static/index.html`. Features:
+Features:
 - Login & registration
 - Dashboard with balance overview
 - Account cards with individual transaction history
@@ -147,14 +151,14 @@ Single-page app at `src/main/resources/static/index.html`. Features:
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | Language | Java 21 |
 | Framework | Spring Boot 3.2 |
 | Security | Spring Security 6 + JWT (JJWT 0.12) |
-| Database | H2 (dev) / PostgreSQL (prod) |
+| Database | H2 (dev) / PostgreSQL |
 | ORM | Spring Data JPA + Hibernate |
 | Encryption | AES-128/CBC (JPA AttributeConverter) |
 | Password | BCrypt (strength 12) |
