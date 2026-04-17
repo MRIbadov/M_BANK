@@ -53,6 +53,17 @@ async function refreshAuthenticatedState() {
     ui.renderAllTx();
 }
 
+async function refreshOnFocus() {
+    if (!state.token || document.hidden) return;
+
+    try {
+        await refreshAuthenticatedState();
+    } catch (err) {
+        localStorage.removeItem('nb_token');
+        location.reload();
+    }
+}
+
 // --- AUTH LOGIC ---
 window.switchAuthTab = (tab) => {
     document.querySelectorAll('.auth-tab').forEach((t, i) =>
@@ -106,14 +117,6 @@ window.doRegister = async (e) => {
 window.logout = () => {
     localStorage.removeItem('nb_token');
     location.reload();
-};
-
-window.refreshData = async () => {
-    try {
-        await refreshAuthenticatedState();
-    } catch (err) {
-        showToast(err.message || 'Unable to refresh data.');
-    }
 };
 
 window.toggleTransferDestination = () => {
@@ -200,3 +203,6 @@ window.createAccount = async () =>{
         showToast('Session expired. Please sign in again.');
     }
 })();
+
+document.addEventListener('visibilitychange', refreshOnFocus);
+window.addEventListener('focus', refreshOnFocus);
