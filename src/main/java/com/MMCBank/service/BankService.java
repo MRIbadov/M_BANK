@@ -9,9 +9,11 @@ import com.MMCBank.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BankService {
@@ -33,9 +35,11 @@ public class BankService {
 
     public AccountResponse createAccount(User user, String name, Account.AccountType type) {
         Account acc = new Account();
+        String iban = generateUniqueIban();
         acc.setAccountName(name);
         acc.setAccountType(type);
-        acc.setAccountNumber(checkValidIban());
+        acc.setAccountNumber(iban);
+        acc.setAccountNumberHash(hashAccountNumber(iban));
         acc.setCurrency("PLN");
         acc.setUser(user);
         return toAccountResponse(accountRepo.save(acc));
@@ -44,6 +48,9 @@ public class BankService {
 
     public List<TransactionResponse> getAllTransactions(User user) {
         List<Account> accounts = accountRepo.findByUserAndActiveTrue(user);
+        if (accounts.isEmpty()) {
+            return List.of();
+        }
         return txRepo.findByAccounts(accounts)
                 .stream().map(this::toTxResponse).toList();
     }
@@ -80,7 +87,7 @@ public class BankService {
                 throw new IllegalArgumentException("Destination IBAN is required");
             }
 
-            to = accountRepo.findByAccountNumber(req.toAccountNumber())
+            to = accountRepo.findByAccountNumberHash(hashAccountNumber(req.toAccountNumber()))
                     .orElseThrow(() -> new RuntimeException("Destination account not found"));
 
             if (from.getId().equals(to.getId())) {
@@ -133,13 +140,30 @@ public class BankService {
                     (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000));
     }
 
-    private String checkValidIban(){
-        String unique_Iban;
+    private String generateUniqueIban() {
+        String uniqueIban;
         do {
-            unique_Iban = generateIban();
+            uniqueIban = generateIban();
+        } while (accountRepo.existsByAccountNumberHash(hashAccountNumber(uniqueIban)));
 
-        }while(accountRepo.existsByAccountNumber(unique_Iban));
+        return uniqueIban;
+    }
 
-        return unique_Iban;
+    private String hashAccountNumber(String accountNumber) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(normalizeAccountNumber(accountNumber).getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
+    }
+
+    private String normalizeAccountNumber(String accountNumber) {
+        return accountNumber.replaceAll("\\s+", "").toUpperCase();
     }
 }

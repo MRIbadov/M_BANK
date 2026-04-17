@@ -24,6 +24,9 @@ public class Account {
     @Column(nullable = false, unique = true, length = 512)
     private String accountNumber;
 
+    @Column(nullable = false, unique = true, length = 64)
+    private String accountNumberHash;
+
     @Column(nullable = false)
     private String accountName;
 

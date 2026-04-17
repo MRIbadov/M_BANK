@@ -12,7 +12,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
@@ -43,6 +46,7 @@ public class MMCBankApplication {
             // Checking account
             Account checking = new Account();
             checking.setAccountNumber("PL10 1050 0099 7603 1234 5678 9012");
+            checking.setAccountNumberHash(hashAccountNumber(checking.getAccountNumber()));
             checking.setAccountType(Account.AccountType.CHECKING);
             checking.setAccountName("Main Checking");
             checking.setBalance(new BigDecimal("18450.00"));
@@ -53,6 +57,7 @@ public class MMCBankApplication {
             // Savings account
             Account savings = new Account();
             savings.setAccountNumber("PL10 1050 0099 7603 9876 5432 1098");
+            savings.setAccountNumberHash(hashAccountNumber(savings.getAccountNumber()));
             savings.setAccountType(Account.AccountType.SAVINGS);
             savings.setAccountName("Savings Reserve");
             savings.setBalance(new BigDecimal("54200.00"));
@@ -92,5 +97,23 @@ public class MMCBankApplication {
         tx.setStatus(Transaction.TransactionStatus.COMPLETED);
         tx.setReference("TXN" + System.nanoTime());
         repo.save(tx);
+    }
+
+    private String hashAccountNumber(String accountNumber) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(normalizeAccountNumber(accountNumber).getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
+    }
+
+    private String normalizeAccountNumber(String accountNumber) {
+        return accountNumber.replaceAll("\\s+", "").toUpperCase();
     }
 }

@@ -12,7 +12,7 @@ function hydrateProfile() {
     $('top-avatar').textContent = user.firstName?.[0]?.toUpperCase() || '?';
 
     $('pf-account-number').innerHTML = state.accounts.length
-        ? state.accounts.map(a => `${a.accountName}: ${a.accountNumber}`).join('<br>')
+        ? state.accounts.map(a => a.accountNumber).join('<br>')
         : 'No accounts yet';
     $('profile-name').textContent = fullName;
     $('profile-uname').textContent = `@${user.username}`;
@@ -106,6 +106,14 @@ window.doRegister = async (e) => {
 window.logout = () => {
     localStorage.removeItem('nb_token');
     location.reload();
+};
+
+window.refreshData = async () => {
+    try {
+        await refreshAuthenticatedState();
+    } catch (err) {
+        showToast(err.message || 'Unable to refresh data.');
+    }
 };
 
 window.toggleTransferDestination = () => {
