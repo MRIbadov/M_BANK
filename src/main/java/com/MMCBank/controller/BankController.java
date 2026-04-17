@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bank")
@@ -35,6 +36,7 @@ public class BankController {
     public ResponseEntity<List<AccountResponse>> getAccounts(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bankService.getAccounts(user));
     }
+
 
     // POST /api/bank/accounts
     @PostMapping("/accounts")

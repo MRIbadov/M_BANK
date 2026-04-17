@@ -11,6 +11,9 @@ function hydrateProfile() {
     $('dash-greeting').textContent = `Welcome back, ${user.firstName}!`;
     $('top-avatar').textContent = user.firstName?.[0]?.toUpperCase() || '?';
 
+    $('pf-account-number').innerHTML = state.accounts.length
+        ? state.accounts.map(a => `${a.accountName}: ${a.accountNumber}`).join('<br>')
+        : 'No accounts yet';
     $('profile-name').textContent = fullName;
     $('profile-uname').textContent = `@${user.username}`;
     $('profile-avatar').textContent = user.firstName?.[0]?.toUpperCase() || '?';
@@ -18,7 +21,7 @@ function hydrateProfile() {
     $('pf-last').textContent = user.lastName;
     $('pf-email').textContent = user.email;
     $('pf-username').textContent = user.username;
-    $('pf-phone').textContent = user.phoneNumber || '—';
+    $('pf-phone').textContent = user.phoneNumber || '—'
 }
 
 function hydrateAccountSelectors() {
@@ -28,6 +31,7 @@ function hydrateAccountSelectors() {
 
     $('tf-from').innerHTML = accountOptions;
     $('tf-to').innerHTML = accountOptions;
+    window.toggleTransferDestination();
 
     const filterOptions = state.accounts.map(a =>
         `<option value="${a.id}">${a.accountName}</option>`
@@ -104,14 +108,31 @@ window.logout = () => {
     location.reload();
 };
 
+window.toggleTransferDestination = () => {
+    const destinationType = $('tf-destination-type')?.value || 'DOMESTIC';
+    $('tf-domestic-group').style.display = destinationType === 'DOMESTIC' ? 'block' : 'none';
+    $('tf-external-group').style.display = destinationType === 'EXTERNAL' ? 'block' : 'none';
+};
+
+
+
 window.doTransfer = async () => {
     try {
-        await api('/api/bank/transfer', 'POST', {
+        const destinationType = $('tf-destination-type').value;
+        const payload = {
             fromAccountId: Number($('tf-from').value),
-            toAccountId: Number($('tf-to').value),
+            destinationType,
             amount: Number($('tf-amount').value),
             description: $('tf-desc').value
-        });
+        };
+
+        if (destinationType === 'DOMESTIC') {
+            payload.toAccountId = Number($('tf-to').value);
+        } else {
+            payload.toAccountNumber = $('tf-iban').value.trim();
+        }
+
+        await api('/api/bank/transfer', 'POST', payload);
 
         showAlert('transfer-alert-success', 'Transfer completed successfully.');
         window.clearTransfer();
@@ -124,6 +145,9 @@ window.doTransfer = async () => {
 window.clearTransfer = () => {
     $('tf-amount').value = '';
     $('tf-desc').value = '';
+    $('tf-iban').value = '';
+    $('tf-destination-type').value = 'DOMESTIC';
+    window.toggleTransferDestination();
 };
 
 // --- NAVIGATION ---
@@ -133,6 +157,27 @@ window.navigate = (page) => {
     $('page-' + page).classList.add('active');
     if (page === 'transactions') ui.renderAllTx();
 };
+
+window.createAccount = async () =>{
+    try{
+        const type = $('new-type').value;
+        const name = $('new-name').value.trim() || 'New Account';
+
+
+        await api('/api/bank/accounts', 'POST',{
+            type, name
+        });
+
+        showAlert('new-acc-success', 'Account created successfully.');
+        $('new-name').value = '';   
+
+        await refreshAuthenticatedState();
+        navigate('accounts');
+    }
+    catch (err) {
+        showAlert('new-acc-error', err.message);
+    }
+}
 
 // --- INIT ---
 (async () => {

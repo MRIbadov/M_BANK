@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankService {
@@ -25,8 +26,6 @@ public class BankService {
         this.txRepo      = txRepo;
     }
 
-    // ── Accounts ──────────────────────────────────────────────
-
     public List<AccountResponse> getAccounts(User user) {
         return accountRepo.findByUserAndActiveTrue(user)
                 .stream().map(this::toAccountResponse).toList();
@@ -36,13 +35,12 @@ public class BankService {
         Account acc = new Account();
         acc.setAccountName(name);
         acc.setAccountType(type);
-        acc.setAccountNumber(generateIban());
+        acc.setAccountNumber(checkValidIban());
         acc.setCurrency("PLN");
         acc.setUser(user);
         return toAccountResponse(accountRepo.save(acc));
     }
 
-    // ── Transactions ──────────────────────────────────────────
 
     public List<TransactionResponse> getAllTransactions(User user) {
         List<Account> accounts = accountRepo.findByUserAndActiveTrue(user);
@@ -57,18 +55,38 @@ public class BankService {
                 .stream().map(this::toTxResponse).toList();
     }
 
-    // ── Transfer ──────────────────────────────────────────────
+
 
     @Transactional
     public TransactionResponse transfer(User user, TransferRequest req) {
-        if (req.fromAccountId().equals(req.toAccountId())) {
-            throw new IllegalArgumentException("Cannot transfer to the same account");
-        }
-
         Account from = accountRepo.findByIdAndUser(req.fromAccountId(), user)
                 .orElseThrow(() -> new RuntimeException("Source account not found or not yours"));
-        Account to = accountRepo.findById(req.toAccountId())
-                .orElseThrow(() -> new RuntimeException("Destination account not found"));
+
+        Account to;
+
+        if (req.destinationType() == DestinationType.DOMESTIC) {
+            if (req.toAccountId() == null) {
+                throw new IllegalArgumentException("Destination account is required");
+            }
+
+            if (req.fromAccountId().equals(req.toAccountId())) {
+                throw new IllegalArgumentException("Cannot transfer to the same account");
+            }
+
+            to = accountRepo.findById(req.toAccountId())
+                    .orElseThrow(() -> new RuntimeException("Destination account not found"));
+        } else {
+            if (req.toAccountNumber() == null || req.toAccountNumber().isBlank()) {
+                throw new IllegalArgumentException("Destination IBAN is required");
+            }
+
+            to = accountRepo.findByAccountNumber(req.toAccountNumber())
+                    .orElseThrow(() -> new RuntimeException("Destination account not found"));
+
+            if (from.getId().equals(to.getId())) {
+                throw new IllegalArgumentException("Cannot transfer to the same account");
+            }
+        }
 
         if (from.getBalance().compareTo(req.amount()) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
@@ -91,7 +109,6 @@ public class BankService {
         return toTxResponse(txRepo.save(tx));
     }
 
-    // ── Mappers ───────────────────────────────────────────────
 
     private AccountResponse toAccountResponse(Account a) {
         return new AccountResponse(
@@ -109,10 +126,20 @@ public class BankService {
     }
 
     private String generateIban() {
-        return String.format("PL%02d %04d %04d %04d %04d %04d %04d",
-                (int)(Math.random()*90+10),
-                (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000),
-                (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000),
-                (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000));
+            return String.format("PL%02d %04d %04d %04d %04d %04d %04d",
+                    (int)(Math.random()*90+10),
+                    (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000),
+                    (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000),
+                    (int)(Math.random()*9000+1000), (int)(Math.random()*9000+1000));
+    }
+
+    private String checkValidIban(){
+        String unique_Iban;
+        do {
+            unique_Iban = generateIban();
+
+        }while(accountRepo.existsByAccountNumber(unique_Iban));
+
+        return unique_Iban;
     }
 }

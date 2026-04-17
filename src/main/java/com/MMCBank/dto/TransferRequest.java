@@ -6,7 +6,11 @@ import java.math.BigDecimal;
 
 public record TransferRequest(
     @NotNull Long fromAccountId,
-    @NotNull Long toAccountId,
+
+     @NotNull DestinationType destinationType,
+
+     Long toAccountId,
+     String toAccountNumber,
     @NotNull @Positive BigDecimal amount,
     String description
 ) {}
