@@ -19,7 +19,6 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // IBAN-style account number — encrypted at rest
     @Convert(converter = EncryptionConverter.class)
     @Column(nullable = false, unique = true, length = 512)
     private String accountNumber;

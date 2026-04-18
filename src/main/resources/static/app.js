@@ -64,7 +64,6 @@ async function refreshOnFocus() {
     }
 }
 
-// --- AUTH LOGIC ---
 window.switchAuthTab = (tab) => {
     document.querySelectorAll('.auth-tab').forEach((t, i) =>
         t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register')));
@@ -161,7 +160,6 @@ window.clearTransfer = () => {
     window.toggleTransferDestination();
 };
 
-// --- NAVIGATION ---
 window.navigate = (page) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -190,7 +188,6 @@ window.createAccount = async () =>{
     }
 }
 
-// --- INIT ---
 (async () => {
     if (!state.token) return;
 

@@ -32,7 +32,6 @@ public class User implements UserDetails {
 
     @Email
     @NotBlank
-    // Email is AES-encrypted at rest
     @Convert(converter = EncryptionConverter.class)
     @Column(nullable = false, unique = true, length = 512)
     private String email;
@@ -43,10 +42,8 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false)
-    // BCrypt-hashed by Spring Security
     private String password;
 
-    // Phone is AES-encrypted at rest
     @Convert(converter = EncryptionConverter.class)
     @Column(length = 512)
     private String phoneNumber;
@@ -63,7 +60,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Account> accounts;
 
-    // ── UserDetails impl ──────────────────────────────
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));

@@ -85,10 +85,7 @@ public class SecurityConfig {
         return provider;
     }
 
-    /**
      * BCrypt with strength 12 — strong enough for production,
-     * still performant on modern hardware.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);

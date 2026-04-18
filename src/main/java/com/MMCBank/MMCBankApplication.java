@@ -33,7 +33,6 @@ public class MMCBankApplication {
             PasswordEncoder passwordEncoder) {
 
         return args -> {
-            // Demo user
             User user = new User();
             user.setFirstName("John");
             user.setLastName("Doe");
@@ -43,7 +42,6 @@ public class MMCBankApplication {
             user.setPhoneNumber("+48 123 456 789");
             user = userRepo.save(user);
 
-            // Checking account
             Account checking = new Account();
             checking.setAccountNumber("PL10 1050 0099 7603 1234 5678 9012");
             checking.setAccountNumberHash(hashAccountNumber(checking.getAccountNumber()));
@@ -54,7 +52,6 @@ public class MMCBankApplication {
             checking.setUser(user);
             checking = accountRepo.save(checking);
 
-            // Savings account
             Account savings = new Account();
             savings.setAccountNumber("PL10 1050 0099 7603 9876 5432 1098");
             savings.setAccountNumberHash(hashAccountNumber(savings.getAccountNumber()));
@@ -65,7 +62,6 @@ public class MMCBankApplication {
             savings.setUser(user);
             savings = accountRepo.save(savings);
 
-            // Seed transactions
             createTx(txRepo, "Salary — March", new BigDecimal("8500.00"),
                     Transaction.TransactionType.CREDIT, checking, null, LocalDateTime.now().minusDays(1));
             createTx(txRepo, "Grocery Store", new BigDecimal("245.60"),

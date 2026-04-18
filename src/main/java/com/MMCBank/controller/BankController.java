@@ -23,7 +23,6 @@ public class BankController {
         this.bankService = bankService;
     }
 
-    // GET /api/bank/profile
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(new UserProfileResponse(
@@ -31,14 +30,12 @@ public class BankController {
                 user.getEmail(), user.getUsername(), user.getPhoneNumber()));
     }
 
-    // GET /api/bank/accounts
     @GetMapping("/accounts")
     public ResponseEntity<List<AccountResponse>> getAccounts(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bankService.getAccounts(user));
     }
 
 
-    // POST /api/bank/accounts
     @PostMapping("/accounts")
     public ResponseEntity<AccountResponse> createAccount(
             @AuthenticationPrincipal User user,
@@ -54,21 +51,18 @@ public class BankController {
         return ResponseEntity.ok(bankService.createAccount(user, name, accountType));
     }
 
-    // GET /api/bank/transactions
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionResponse>> getAllTransactions(
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bankService.getAllTransactions(user));
     }
 
-    // GET /api/bank/accounts/{id}/transactions
     @GetMapping("/accounts/{id}/transactions")
     public ResponseEntity<List<TransactionResponse>> getAccountTransactions(
             @AuthenticationPrincipal User user, @PathVariable Long id) {
         return ResponseEntity.ok(bankService.getAccountTransactions(user, id));
     }
 
-    // POST /api/bank/transfer
     @PostMapping("/transfer")
     public ResponseEntity<?> transfer(
             @AuthenticationPrincipal User user,

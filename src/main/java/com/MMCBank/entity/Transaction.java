@@ -19,11 +19,9 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Unique reference number
     @Column(nullable = false, unique = true)
     private String reference;
 
-    // Description is AES-encrypted at rest
     @Convert(converter = EncryptionConverter.class)
     @Column(length = 1024)
     private String description;

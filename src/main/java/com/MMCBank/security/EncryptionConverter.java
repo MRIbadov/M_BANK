@@ -43,7 +43,6 @@ public class EncryptionConverter implements AttributeConverter<String, String> {
                               .getIV();
             byte[] encrypted = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
 
-            // Prepend IV to ciphertext, then Base64-encode the whole thing
             byte[] combined = new byte[iv.length + encrypted.length];
             System.arraycopy(iv, 0, combined, 0, iv.length);
             System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
