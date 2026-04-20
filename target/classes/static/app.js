@@ -64,7 +64,6 @@ async function refreshOnFocus() {
     }
 }
 
-// --- AUTH LOGIC ---
 window.switchAuthTab = (tab) => {
     document.querySelectorAll('.auth-tab').forEach((t, i) =>
         t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register')));
@@ -94,6 +93,9 @@ window.doRegister = async (e) => {
     e.preventDefault();
     const btn = $('reg-btn');
     btn.disabled = true;
+    const phoneNumber = $('reg-phone').value.trim();
+
+
     try {
         await api('/api/auth/register', 'POST', {
             firstName: $('reg-first').value,
@@ -103,6 +105,11 @@ window.doRegister = async (e) => {
             password: $('reg-password').value,
             phoneNumber: $('reg-phone').value
         });
+        if (phoneNumber && !/^[+]?[0-9\\s-]+$/.test(phoneNumber)) {
+            showAlert('reg-error', 'Phone number can contain only digits, spaces, dashes, and an optional +.');
+            btn.disabled = false;
+            return;
+        }
 
         showAlert('reg-success', 'Account created successfully. You can sign in now.');
         $('register-form').reset();
@@ -117,14 +124,6 @@ window.doRegister = async (e) => {
 window.logout = () => {
     localStorage.removeItem('nb_token');
     location.reload();
-};
-
-window.refreshData = async () => {
-    try {
-        await refreshAuthenticatedState();
-    } catch (err) {
-        showToast(err.message || 'Unable to refresh data.');
-    }
 };
 
 window.toggleTransferDestination = () => {
@@ -169,7 +168,6 @@ window.clearTransfer = () => {
     window.toggleTransferDestination();
 };
 
-// --- NAVIGATION ---
 window.navigate = (page) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -198,7 +196,6 @@ window.createAccount = async () =>{
     }
 }
 
-// --- INIT ---
 (async () => {
     if (!state.token) return;
 

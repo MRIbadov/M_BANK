@@ -114,7 +114,6 @@ input:focus, select:focus {
 }
 .demo-hint strong { display: block; margin-bottom: 2px; }
 
-/* ─── App Layout ────────────────────────────────────── */
 #app { display: none; min-height: 100vh; }
 
 .topbar {
@@ -166,7 +165,6 @@ input:focus, select:focus {
 
 .main-content { flex: 1; padding: 28px; overflow-y: auto; }
 
-/* ─── Pages ─────────────────────────────────────────── */
 .page { display: none; }
 .page.active { display: block; animation: fadeUp 0.25s ease; }
 
@@ -175,7 +173,6 @@ input:focus, select:focus {
 .page-title { font-family: 'Inter', sans-serif; font-size: 28px; color: var(--text); margin-bottom: 4px; }
 .page-sub { font-size: 13px; color: var(--text-md); margin-bottom: 24px; }
 
-/* ─── Cards ─────────────────────────────────────────── */
 .card {
     background: white; border-radius: var(--radius);
     border: 1px solid var(--border); padding: 24px;
@@ -193,7 +190,6 @@ input:focus, select:focus {
 .stat-badge.up { background: var(--green-lt); color: var(--green); }
 .stat-badge.info { background: var(--blue-lt); color: var(--blue); }
 
-/* ─── Account Cards ─────────────────────────────────── */
 .account-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
 
 .account-card {
@@ -215,7 +211,6 @@ input:focus, select:focus {
 
 .chip { position: absolute; right: 20px; top: 20px; width: 36px; height: 26px; background: rgba(255,255,255,0.2); border-radius: 4px; }
 
-/* ─── Table ─────────────────────────────────────────── */
 .table-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
 .table-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .table-title { font-size: 15px; font-weight: 700; }
@@ -236,19 +231,16 @@ tbody tr:last-child td { border-bottom: none; }
 .amount-out { color: var(--red);    font-weight: 600; }
 .amount-tx  { color: var(--indigo); font-weight: 600; }
 
-/* ─── Form ───────────────────────────────────────────── */
 .form-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 28px; box-shadow: var(--shadow); max-width: 520px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-full { grid-column: 1/-1; }
 .form-actions { margin-top: 24px; display: flex; gap: 10px; }
 
-/* ─── Alert ──────────────────────────────────────────── */
 .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
 .alert.show { display: block; }
 .alert-error   { background: var(--red-lt);   color: var(--red);   border: 1px solid #fca5a5; }
 .alert-success { background: var(--green-lt); color: var(--green); border: 1px solid #86efac; }
 
-/* ─── Toast ──────────────────────────────────────────── */
 #toast {
     position: fixed; bottom: 28px; right: 28px;
     background: #1e293b; color: white;
@@ -262,17 +254,14 @@ tbody tr:last-child td { border-bottom: none; }
 #toast.error { background: var(--red); }
 #toast.success { background: var(--green); }
 
-/* ─── Empty State ────────────────────────────────────── */
 .empty { text-align: center; padding: 48px 24px; color: var(--text-sm); }
 .empty-icon { font-size: 40px; margin-bottom: 12px; }
 .empty-text { font-size: 14px; font-weight: 500; }
 .empty-sub  { font-size: 12px; margin-top: 4px; }
 
-/* ─── Loading ────────────────────────────────────────── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── Profile ────────────────────────────────────────── */
 .profile-hero {
     background: linear-gradient(135deg, var(--blue), var(--indigo));
     border-radius: var(--radius); padding: 28px; color: white;
@@ -287,7 +276,6 @@ tbody tr:last-child td { border-bottom: none; }
 .info-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-sm); margin-bottom: 4px; }
 .info-value { font-size: 14px; font-weight: 500; }
 
-/* ─── Security notice ────────────────────────────────── */
 .security-banner {
     background: var(--blue-lt); border: 1px solid var(--blue-mid);
     border-radius: 10px; padding: 14px 18px;

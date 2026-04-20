@@ -22,5 +22,4 @@ export function emptyRow(cols, msg='No data yet') {
     return `<tr><td colspan="${cols}"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">${msg}</div></div></td></tr>`;
 }
 
-// Attach to window so HTML can see them
 window.showAlert = showAlert;

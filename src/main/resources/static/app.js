@@ -93,6 +93,9 @@ window.doRegister = async (e) => {
     e.preventDefault();
     const btn = $('reg-btn');
     btn.disabled = true;
+    const phoneNumber = $('reg-phone').value.trim();
+
+
     try {
         await api('/api/auth/register', 'POST', {
             firstName: $('reg-first').value,
@@ -102,6 +105,11 @@ window.doRegister = async (e) => {
             password: $('reg-password').value,
             phoneNumber: $('reg-phone').value
         });
+        if (phoneNumber && !/^[+]?[0-9\\s-]+$/.test(phoneNumber)) {
+            showAlert('reg-error', 'Phone number can contain only digits, spaces, dashes, and an optional +.');
+            btn.disabled = false;
+            return;
+        }
 
         showAlert('reg-success', 'Account created successfully. You can sign in now.');
         $('register-form').reset();

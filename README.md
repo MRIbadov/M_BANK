@@ -114,14 +114,13 @@ src/main/java/com/MMCBank/
 - H2 Console: http://localhost:8080/h2-console
 - JDBC URL: `jdbc:h2:mem:aurumbank`
 
-**Complex:** PostgreSQL — uncomment the PostgreSQL config in `application.properties`:
+**Complex:** MySql — uncomment the PostgreSQL config in `application.properties`:
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/aurumbank
-spring.datasource.username=postgres
-spring.datasource.password=yourpassword
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-```
+spring.datasource.url=jdbc:mysql://localhost:3306/name_of_database
+spring.datasource.username=username
+spring.datasource.password=password
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
 ---
 
@@ -153,14 +152,14 @@ Features:
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Language | Java 21 |
-| Framework | Spring Boot 3.2 |
-| Security | Spring Security 6 + JWT (JJWT 0.12) |
-| Database | H2 (dev) / PostgreSQL |
-| ORM | Spring Data JPA + Hibernate |
+| Layer | Technology                           |
+|-------|--------------------------------------|
+| Language | Java 21                              |
+| Framework | Spring Boot 3.2                      |
+| Security | Spring Security 6 + JWT (JJWT 0.12)  |
+| Database | H2 (dev) / MySQL                     |
+| ORM | Spring Data JPA + Hibernate          |
 | Encryption | AES-128/CBC (JPA AttributeConverter) |
-| Password | BCrypt (strength 12) |
-| Build | Maven |
-| Frontend | HTML5 + CSS3 + Vanilla JS |
+| Password | BCrypt (strength 12)                 |
+| Build | Maven                                |
+| Frontend | HTML5 + CSS3 + Vanilla JS            |
