@@ -1,6 +1,6 @@
 # — Spring Boot Bank Management System
 
-A secure, full-stack banking web application built with Java 21, Spring Boot 3, Spring Security, and an H2/PostgreSQL database.
+A secure, full-stack banking web application built with Java 21, Spring Boot 3, Spring Security, and an H2/MySql database.
 
 
 ![tt](https://github.com/user-attachments/assets/81cbfe4f-6476-46b5-9663-74b0012d1587)
